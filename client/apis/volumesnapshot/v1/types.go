@@ -23,6 +23,9 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
+// zhou: not only creating a point-in-time snapshot but also binding to a pre-existing snapshot
+//       if it exist.
+
 // +genclient
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
@@ -78,6 +81,9 @@ type VolumeSnapshotSpec struct {
 	// Required.
 	Source VolumeSnapshotSource `json:"source" protobuf:"bytes,1,opt,name=source"`
 
+	// zhou: "A given cluster may have multiple default Volume SnapshotClasses: one
+	//        default per CSI Driver. "
+
 	// VolumeSnapshotClassName is the name of the VolumeSnapshotClass
 	// requested by the VolumeSnapshot.
 	// VolumeSnapshotClassName may be left nil to indicate that the default
@@ -93,6 +99,9 @@ type VolumeSnapshotSpec struct {
 	// +optional
 	VolumeSnapshotClassName *string `json:"volumeSnapshotClassName,omitempty" protobuf:"bytes,2,opt,name=volumeSnapshotClassName"`
 }
+
+// zhou: take snapshot of PVC,
+//       or binding with pre-existing VolumeSnapshotContent.
 
 // VolumeSnapshotSource specifies whether the underlying snapshot should be
 // dynamically taken upon creation or if a pre-existing VolumeSnapshotContent
@@ -337,6 +346,8 @@ type VolumeSnapshotContentSpec struct {
 	// +optional
 	SourceVolumeMode *SourceVolumeMode `json:"sourceVolumeMode" protobuf:"bytes,6,opt,name=sourceVolumeMode"`
 }
+
+// zhou: source for VolumeSnapshotContent.
 
 // VolumeSnapshotContentSource represents the CSI source of a snapshot.
 // Exactly one of its members must be set.

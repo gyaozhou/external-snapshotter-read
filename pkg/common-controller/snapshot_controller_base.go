@@ -70,6 +70,8 @@ type csiSnapshotCommonController struct {
 	enableDistributedSnapshotting bool
 }
 
+// zhou:
+
 // NewCSISnapshotController returns a new *csiSnapshotCommonController
 func NewCSISnapshotCommonController(
 	clientset clientset.Interface,
@@ -141,6 +143,7 @@ func NewCSISnapshotCommonController(
 	return ctrl
 }
 
+// zhou: busy loop of this controller
 func (ctrl *csiSnapshotCommonController) Run(workers int, stopCh <-chan struct{}) {
 	defer ctrl.snapshotQueue.ShutDown()
 	defer ctrl.contentQueue.ShutDown()
@@ -161,7 +164,7 @@ func (ctrl *csiSnapshotCommonController) Run(workers int, stopCh <-chan struct{}
 	ctrl.initializeCaches(ctrl.snapshotLister, ctrl.contentLister)
 
 	for i := 0; i < workers; i++ {
-		go wait.Until(ctrl.snapshotWorker, 0, stopCh)
+		go wait.Until(ctrl.jsnapshotWorker, 0, stopCh)
 		go wait.Until(ctrl.contentWorker, 0, stopCh)
 	}
 
@@ -202,8 +205,8 @@ func (ctrl *csiSnapshotCommonController) enqueueContentWork(obj interface{}) {
 	}
 }
 
-// snapshotWorker is the main worker for VolumeSnapshots.
-func (ctrl *csiSnapshotCommonController) snapshotWorker() {
+// jsnapshotWorker is the main worker for VolumeSnapshots.
+func (ctrl *csiSnapshotCommonController) jsnapshotWorker() {
 	keyObj, quit := ctrl.snapshotQueue.Get()
 	if quit {
 		return
@@ -222,12 +225,14 @@ func (ctrl *csiSnapshotCommonController) snapshotWorker() {
 	}
 }
 
+// zhou: reconcile VolumeSnapshot
+
 // syncSnapshotByKey processes a VolumeSnapshot request.
 func (ctrl *csiSnapshotCommonController) syncSnapshotByKey(key string) error {
 	klog.V(5).Infof("syncSnapshotByKey[%s]", key)
 
 	namespace, name, err := cache.SplitMetaNamespaceKey(key)
-	klog.V(5).Infof("snapshotWorker: snapshot namespace [%s] name [%s]", namespace, name)
+	klog.V(5).Infof("jsnapshotWorker: snapshot namespace [%s] name [%s]", namespace, name)
 	if err != nil {
 		klog.Errorf("error getting namespace & name of snapshot %q to get snapshot from informer: %v", key, err)
 		return nil
@@ -296,6 +301,8 @@ func (ctrl *csiSnapshotCommonController) contentWorker() {
 		ctrl.contentQueue.Forget(keyObj)
 	}
 }
+
+// zhou: reconcile VolumeSnapshotContent
 
 // syncContentByKey processes a VolumeSnapshotContent request.
 func (ctrl *csiSnapshotCommonController) syncContentByKey(key string) error {
@@ -375,6 +382,8 @@ func (ctrl *csiSnapshotCommonController) checkAndUpdateSnapshotClass(snapshot *c
 	return newSnapshot, nil
 }
 
+// zhou:
+
 // updateSnapshot runs in worker thread and handles "snapshot added",
 // "snapshot updated" and "periodic sync" events.
 func (ctrl *csiSnapshotCommonController) updateSnapshot(snapshot *crdv1.VolumeSnapshot) error {
@@ -402,6 +411,8 @@ func (ctrl *csiSnapshotCommonController) updateSnapshot(snapshot *crdv1.VolumeSn
 	}
 	return nil
 }
+
+// zhou:
 
 // updateContent runs in worker thread and handles "content added",
 // "content updated" and "periodic sync" events.

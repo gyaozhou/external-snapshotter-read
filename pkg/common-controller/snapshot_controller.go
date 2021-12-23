@@ -82,6 +82,8 @@ const snapshotAPIGroup = crdv1.GroupName
 
 const controllerUpdateFailMsg = "snapshot controller failed to update"
 
+// zhou:
+
 // syncContent deals with one key off the queue
 func (ctrl *csiSnapshotCommonController) syncContent(content *crdv1.VolumeSnapshotContent) error {
 	snapshotName := utils.SnapshotRefKey(&content.Spec.VolumeSnapshotRef)
@@ -173,6 +175,8 @@ func (ctrl *csiSnapshotCommonController) syncContent(content *crdv1.VolumeSnapsh
 
 	return nil
 }
+
+// zhou:
 
 // syncSnapshot is the main controller method to decide what to do with a snapshot.
 // It's invoked by appropriate cache.Controller callbacks when a snapshot is
@@ -761,6 +765,7 @@ func (ctrl *csiSnapshotCommonController) getCreateSnapshotInput(snapshot *crdv1.
 	return class, volume, contentName, snapshotterSecretRef, nil
 }
 
+// zhou:
 func (ctrl *csiSnapshotCommonController) storeSnapshotUpdate(snapshot interface{}) (bool, error) {
 	return utils.StoreObjectUpdate(ctrl.snapshotStore, snapshot, "snapshot")
 }

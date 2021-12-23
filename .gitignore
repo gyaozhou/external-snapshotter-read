@@ -1,2 +1,5 @@
 # Compiled binaries and deployment files
 /bin/
+TAGS
+cscope.files
+cscope.out

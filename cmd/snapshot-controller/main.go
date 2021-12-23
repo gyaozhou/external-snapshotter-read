@@ -114,6 +114,7 @@ func ensureCustomResourceDefinitionsExist(client *clientset.Clientset) error {
 	return nil
 }
 
+// zhou: VolumeSnapshot Controller
 func main() {
 	klog.InitFlags(nil)
 	flag.Set("logtostderr", "true")
@@ -174,6 +175,7 @@ func main() {
 
 	klog.V(2).Infof("Start NewCSISnapshotController with kubeconfig [%s] resyncPeriod [%+v]", *kubeconfig, *resyncPeriod)
 
+	// zhou:
 	ctrl := controller.NewCSISnapshotCommonController(
 		snapClient,
 		kubeClient,
